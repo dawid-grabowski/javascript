@@ -1,5 +1,5 @@
 import type { RequestState } from '@clerk/backend';
-import { constants, createIsomorphicRequest } from '@clerk/backend';
+import { buildOrigin, constants, createIsomorphicRequest } from '@clerk/backend';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from './shared';
@@ -104,22 +104,20 @@ const isDevelopmentFromApiKey = (apiKey: string): boolean =>
   apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
 
 const getRequestUrl = (req: IncomingMessage): URL => {
-  return new URL(req.url as string, `${getRequestProto(req)}://${req.headers.host}`);
-};
-
-const getRequestProto = (req: IncomingMessage): string => {
   // @ts-ignore Optimistic attempt to get the protocol in case
   // req extends IncomingMessage in a useful way. No guarantee
   // it'll work.
-  const mightWork = req.connection?.encrypted ? 'https' : 'http';
-  // The x-forwarded-proto header takes precedence.
-  const proto = (req.headers[constants.Headers.ForwardedProto] as string) || mightWork;
-  if (!proto) {
+  const protocol = req.connection?.encrypted ? 'https' : 'http';
+  const forwardedProto = req.headers[constants.Headers.ForwardedProto] as string;
+  const host = req.headers.host;
+  const forwardedHost = req.headers[constants.Headers.ForwardedHost] as string;
+
+  const origin = buildOrigin({ protocol, forwardedProto, forwardedHost, host });
+  if (!origin) {
     throw new Error(missingProto);
   }
-  // Sometimes the x-forwarded-proto header does not come as a
-  // single value.
-  return proto.split(',')[0].trim();
+
+  return new URL(req.url as string, origin);
 };
 
 const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): string => {
