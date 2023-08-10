@@ -20,6 +20,7 @@ type Options = {
       label: string | LocalizationKey;
       validatePassword?: never;
       buildErrorMessage?: never;
+      passwordMinLength?: never;
       type?: Exclude<HTMLInputTypeAttribute, 'password' | 'radio'>;
       radioOptions?: never;
     }
@@ -27,12 +28,14 @@ type Options = {
       label: string | LocalizationKey;
       type: Extract<HTMLInputTypeAttribute, 'password'>;
       validatePassword: boolean;
+      passwordMinLength?: number;
       buildErrorMessage?: (err: ClerkAPIError[]) => ClerkAPIError | string | undefined;
       radioOptions?: never;
     }
   | {
       validatePassword?: never;
       buildErrorMessage?: never;
+      passwordMinLength?: never;
       type: Extract<HTMLInputTypeAttribute, 'radio'>;
       label?: string | LocalizationKey;
       radioOptions: {
@@ -84,6 +87,7 @@ export const useFormControl = <Id extends string>(
     enableErrorAfterBlur: false,
     informationText: '',
     defaultChecked: false,
+    passwordMinLength: 8,
   };
 
   const { translateError } = useLocalizations();
@@ -136,8 +140,15 @@ export const useFormControl = <Id extends string>(
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { defaultChecked, validatePassword: validatePasswordProp, buildErrorMessage, ...restOpts } = opts;
+  const {
+    defaultChecked,
+    validatePassword: validatePasswordProp,
+    buildErrorMessage,
+    passwordMinLength,
+    ...restOpts
+  } = opts;
 
+  // console.log(passwordMinLength, 'passwordMinLength')
   const props = {
     id,
     name: id,
@@ -157,6 +168,7 @@ export const useFormControl = <Id extends string>(
     warningText,
     hasPassedComplexity,
     setHasPassedComplexity,
+    passwordMinLength: 8,
     validatePassword: opts.type === 'password' ? opts.validatePassword : undefined,
     ...restOpts,
   };
