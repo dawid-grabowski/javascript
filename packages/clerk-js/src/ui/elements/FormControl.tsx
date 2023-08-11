@@ -202,6 +202,7 @@ type FormFeedbackProps = Partial<
 } & { showText?: boolean; hasPassedLengthValidation?: boolean; debouncePasswordOnType?: boolean };
 
 const delay = 350;
+const passwordDebounceDelay = 2000;
 
 export const FormFeedback = (props: FormFeedbackProps) => {
   const { id, elementDescriptors, debouncePasswordOnType = true } = props;
@@ -376,7 +377,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     if (props.type === 'password' && debouncedState.isFocused) {
       const timeoutId = setTimeout(() => {
         setShowText(true);
-      }, 2000);
+      }, passwordDebounceDelay);
 
       return () => {
         clearTimeout(timeoutId);
