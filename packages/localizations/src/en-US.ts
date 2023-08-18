@@ -703,6 +703,7 @@ export const enUS: LocalizationResource = {
   organizationList: {
     createOrganization: 'Create Organization',
     action__createOrganization: 'Create',
+    action__setActiveOrganization: 'Open',
     actionLink: 'Skip and Continue',
   },
   unstable__errors: {
