@@ -62,7 +62,7 @@ export const UserMembershipList = () => {
   );
 };
 
-const SetActiveButton = (props: OrganizationResource) => {
+export const SetActiveButton = (props: OrganizationResource) => {
   const card = useCardState();
   const { navigateAfterSelectOrganization } = useOrganizationListContext();
   const { isLoaded, setActive } = useCoreOrganizationList();
@@ -88,7 +88,7 @@ const SetActiveButton = (props: OrganizationResource) => {
   );
 };
 
-const MembershipPreview = withCardStateProvider((props: OrganizationMembershipResource) => {
+export const MembershipPreview = withCardStateProvider((props: OrganizationMembershipResource) => {
   return (
     <PreviewListItem organizationData={props.organization}>
       <SetActiveButton {...props.organization} />

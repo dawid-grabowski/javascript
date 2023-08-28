@@ -1,7 +1,10 @@
-import { Box, Button, descriptors, Flex, Spinner, Text } from '../../customizables';
+import type { UserOrganizationInvitationResource } from '@clerk/types';
+import type { PropsWithChildren } from 'react';
+import { forwardRef } from 'react';
+
+import type { Text } from '../../customizables';
+import { Box, Button, Col, descriptors, Flex, Spinner } from '../../customizables';
 import { Header, OrganizationPreview } from '../../elements';
-import { forwardRef, PropsWithChildren } from 'react';
-import { UserOrganizationInvitationResource } from '@clerk/types';
 import { common } from '../../styledSystem';
 
 export const PreviewList = (
@@ -49,16 +52,17 @@ export const PreviewListDivider = () => {
 
 export const PreviewListItems = (props: PropsWithChildren) => {
   return (
-    <Box
+    <Col
       elementDescriptor={descriptors.organizationListPreviewItems}
+      gap={3}
       sx={t => ({
-        maxHeight: `calc(4 * ${t.sizes.$12})`,
+        maxHeight: `calc(8 * ${t.sizes.$12})`,
         overflowY: 'auto',
         ...common.unstyledScrollbar(t),
       })}
     >
       {props.children}
-    </Box>
+    </Col>
   );
 };
 
@@ -126,7 +130,8 @@ export const PreviewListItemButton = (props: Parameters<typeof Button>[0]) => {
     <Button
       elementDescriptor={descriptors.organizationListPreviewItemActionButton}
       textVariant='buttonExtraSmallBold'
-      variant='solid'
+      variant='outline'
+      colorScheme='neutral'
       size='sm'
       {...props}
     />

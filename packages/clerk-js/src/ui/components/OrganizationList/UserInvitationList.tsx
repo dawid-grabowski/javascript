@@ -64,7 +64,7 @@ export const UserInvitationList = () => {
   );
 };
 
-const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource) => {
+export const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource) => {
   const card = useCardState();
   const { userInvitations, userMemberships } = useCoreOrganizationList({
     userInvitations: organizationListParams.userInvitations,

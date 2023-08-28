@@ -87,6 +87,7 @@ type UsePagesOrInfinite = <
   cacheKeys: CacheKeys,
 ) => PaginatedResources<ExtractData<FetcherReturnData>> & {
   unstable__mutate: () => Promise<unknown>;
+  unstable__fetchNextAsync: () => Promise<{ pageCount: number }>;
 };
 
 export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options, cacheKeys) => {
@@ -163,8 +164,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
   const fetchPage: ValueOrSetter<number> = useCallback(
     numberOrgFn => {
       if (triggerInfinite) {
-        void setSize(numberOrgFn);
-        return;
+        return setSize(numberOrgFn) as unknown as void;
       }
       return setPaginatedPage(numberOrgFn);
     },
@@ -180,14 +180,17 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
 
   const count = useMemo(() => {
     if (triggerInfinite) {
-      return swrInfiniteData?.[swrInfiniteData?.length - 1]?.total_count || 0;
+      return swrInfiniteData?.[swrInfiniteData?.length - 1]?.total_count; //|| 0;
     }
     return swrData?.total_count ?? 0;
   }, [triggerInfinite, swrData, swrInfiniteData]);
 
+  const offsetCount = (initialPageRef.current - 1) * pageSizeRef.current;
+
   const isLoading = triggerInfinite ? swrInfiniteIsLoading : swrIsLoading;
   const isFetching = triggerInfinite ? swrInfiniteIsValidating : swrIsValidating;
   const isError = !!(triggerInfinite ? swrInfiniteError : swrError);
+
   /**
    * Helpers
    */
@@ -195,11 +198,19 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     fetchPage(n => Math.max(0, n + 1));
   }, [fetchPage]);
 
+  const unstable__fetchNextAsync = useCallback(async () => {
+    const pages = await setSize(n => Math.max(0, n + 1));
+    const count = pages?.[pages?.length - 1]?.total_count || 0;
+    const pageCount = Math.ceil((count - offsetCount) / pageSizeRef.current);
+    return {
+      pageCount,
+      page: pages?.length,
+    };
+  }, [fetchPage]);
+
   const fetchPrevious = useCallback(() => {
     fetchPage(n => Math.max(0, n - 1));
   }, [fetchPage]);
-
-  const offsetCount = (initialPageRef.current - 1) * pageSizeRef.current;
 
   const pageCount = Math.ceil((count - offsetCount) / pageSizeRef.current);
   const hasNextPage = count - offsetCount * pageSizeRef.current > page * pageSizeRef.current;
@@ -221,5 +232,6 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     hasNextPage,
     hasPreviousPage,
     unstable__mutate,
+    unstable__fetchNextAsync,
   };
 };

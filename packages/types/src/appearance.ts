@@ -298,7 +298,7 @@ export type ElementsConfig = {
   organizationSwitcherPopoverFooterPages: WithOptions<never, never, never>;
   organizationSwitcherPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
 
-  organizationListPreviewList: WithOptions<'memberships' | 'suggestions' | 'invitations', never, never>;
+  // organizationListPreviewList: WithOptions<'memberships' | 'suggestions' | 'invitations', never, never>;
   organizationListPreviewListSubtitle: WithOptions<never, never, never>;
   organizationListPreviewListDivider: WithOptions<never, never, never>;
   organizationListPreviewItems: WithOptions<never, never, never>;
