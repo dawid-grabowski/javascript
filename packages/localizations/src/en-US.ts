@@ -712,7 +712,7 @@ export const enUS: LocalizationResource = {
     action__setActiveOrganization: 'Open',
     action__suggestionsAccept: 'Request to join',
     suggestionsAcceptedLabel: 'Pending approval',
-    action__createOrganization: 'Create',
+    action__createOrganization: 'Create organization',
     actionLink: 'Skip and Continue',
   },
   unstable__errors: {

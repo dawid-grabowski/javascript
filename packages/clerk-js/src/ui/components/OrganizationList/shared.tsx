@@ -9,13 +9,13 @@ import { common } from '../../styledSystem';
 
 export const PreviewList = (
   props: PropsWithChildren<{
-    elementId: Parameters<typeof descriptors.organizationListPreviewList.setId>[0];
+    elementId: any; //Parameters<typeof descriptors.organizationListPreviewList.setId>[0];
   }>,
 ) => {
   return (
     <Flex
       direction='col'
-      elementDescriptor={descriptors.organizationListPreviewList}
+      // elementDescriptor={descriptors.organizationListPreviewList}
       gap={2}
     >
       {props.children}
@@ -85,7 +85,7 @@ export const PreviewListItem = (
     >
       <OrganizationPreview
         elementId='organizationList'
-        avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)`, width: t.sizes.$10, height: t.sizes.$10 })}
+        avatarSx={t => ({ width: t.sizes.$10, height: t.sizes.$10 })}
         mainIdentifierSx={t => ({
           fontSize: t.fontSizes.$xl,
           color: t.colors.$colorText,

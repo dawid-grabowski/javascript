@@ -146,7 +146,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationSwitcherPopoverFooterPages',
   'organizationSwitcherPopoverFooterPagesLink',
 
-  'organizationListPreviewList',
+  // 'organizationListPreviewList',
   'organizationListPreviewListSubtitle',
   'organizationListPreviewListDivider',
   'organizationListPreviewItems',

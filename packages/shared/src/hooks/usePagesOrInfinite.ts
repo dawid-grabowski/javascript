@@ -108,6 +108,8 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     pageSize: pageSizeRef.current,
   };
 
+  const [hasMore, setHasMore] = useState(false);
+
   const {
     data: swrData,
     isValidating: swrIsValidating,

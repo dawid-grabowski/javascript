@@ -1,15 +1,10 @@
-import type {
-  ClerkPaginatedResponse,
-  OrganizationSuggestionResource,
-  UserOrganizationInvitationResource,
-} from '@clerk/types';
+import type { ClerkPaginatedResponse, OrganizationSuggestionResource } from '@clerk/types';
 
 import { useCoreOrganizationList } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { handleError } from '../../utils';
-import { organizationListParams } from './utils';
 import {
   PreviewList,
   PreviewListDivider,
@@ -19,6 +14,7 @@ import {
   PreviewListSpinner,
   PreviewListSubtitle,
 } from './shared';
+import { organizationListParams } from './utils';
 
 export const UserSuggestionList = () => {
   const { userSuggestions } = useCoreOrganizationList({
@@ -79,16 +75,20 @@ export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResou
       .then(result => {
         (userSuggestions as any)?.unstable__mutate?.(result, {
           populateCache: (
-            updatedInvitation: UserOrganizationInvitationResource,
-            invitationInfinitePages: ClerkPaginatedResponse<UserOrganizationInvitationResource>[],
+            updatedSuggestion: OrganizationSuggestionResource,
+            suggestionInfinitePages: ClerkPaginatedResponse<OrganizationSuggestionResource>[],
           ) => {
-            const prevTotalCount = invitationInfinitePages[invitationInfinitePages.length - 1].total_count;
+            return suggestionInfinitePages.map(item => {
+              const newData = item.data.map(obj => {
+                if (obj.id === updatedSuggestion.id) {
+                  return {
+                    ...updatedSuggestion,
+                  };
+                }
 
-            return invitationInfinitePages.map(item => {
-              const newData = item.data.filter(obj => {
-                return obj.id !== updatedInvitation.id;
+                return obj;
               });
-              return { ...item, data: newData, total_count: prevTotalCount - 1 };
+              return { ...item, data: newData };
             });
           },
           // Since `accept` gives back the updated information,
@@ -105,6 +105,7 @@ export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResou
         variant='smallRegular'
         colorScheme='neutral'
       >
+        {/*TODO: localize this*/}
         Pending approval
       </Text>
     );
@@ -119,7 +120,7 @@ export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResou
   );
 };
 
-const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionResource) => {
+export const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionResource) => {
   return (
     <PreviewListItem organizationData={props.publicOrganizationData}>
       <AcceptRejectInvitationButtons {...props} />

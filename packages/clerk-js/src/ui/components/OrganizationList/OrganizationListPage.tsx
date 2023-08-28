@@ -1,15 +1,30 @@
 import type { UserOrganizationInvitationResource } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 
-import { useCoreClerk, useCoreOrganizationList, useOrganizationListContext } from '../../contexts';
-import { Box, Button, Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
-import { Card, CardAlert, Header, OrganizationPreview, useCardState, withCardStateProvider } from '../../elements';
+import {
+  useCoreClerk,
+  useCoreOrganizationList,
+  useCoreUser,
+  useEnvironment,
+  useOrganizationListContext,
+} from '../../contexts';
+import { Button, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
+import {
+  Card,
+  CardAlert,
+  Divider,
+  Header,
+  OrganizationPreview,
+  PersonalWorkspacePreview,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { useInView } from '../../hooks';
-import { AcceptRejectInvitationButtons } from './UserInvitationList';
-import { MembershipPreview, SetActiveButton } from './UserMembershipList';
-import { AcceptRejectInvitationButtons as Accept } from './UserSuggestionList';
-import { organizationListParams } from './utils';
 import { PreviewListItems, PreviewListSpinner } from './shared';
+import { InvitationPreview } from './UserInvitationList';
+import { MembershipPreview } from './UserMembershipList';
+import { SuggestionPreview } from './UserSuggestionList';
+import { organizationListParams } from './utils';
 
 export const OrganizationListPage = withCardStateProvider(() => {
   const card = useCardState();
@@ -22,23 +37,29 @@ export const OrganizationListPage = withCardStateProvider(() => {
     navigateCreateOrganization,
   } = useOrganizationListContext();
 
+  const w = useEnvironment();
+  console.log(w.displayConfig.applicationName);
+
   const { userMemberships, userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
 
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
+  console.log(isLoading, hasNextPage, userMemberships.hasNextPage, userInvitations.hasNextPage);
 
   const { ref } = useInView({
     threshold: 0,
-    onChange: async inView => {
+    onChange: inView => {
       if (!inView) {
         return;
       }
 
       if (userMemberships.hasNextPage) {
-        const { pageCount, page } = await (userMemberships as any)?.unstable__fetchNextAsync?.();
+        (userMemberships as any)?.unstable__fetchNextAsync?.();
       } else if (userInvitations.hasNextPage) {
-        const { pageCount, page } = await (userInvitations as any)?.unstable__fetchNextAsync?.();
+        (userInvitations as any)?.unstable__fetchNextAsync?.();
       } else {
         userSuggestions.fetchNext?.();
       }
@@ -54,9 +75,9 @@ export const OrganizationListPage = withCardStateProvider(() => {
 
   return (
     <Card
-      justify={'between'}
+      // justify={'between'}
       sx={t => ({
-        minHeight: t.sizes.$100,
+        // minHeight: t.sizes.$100,
         padding: `${t.space.$8} ${t.space.$none}`,
       })}
     >
@@ -68,7 +89,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
           justify={'center'}
           sx={t => ({
             height: '100%',
-            minHeight: t.sizes.$120,
+            minHeight: t.sizes.$60,
           })}
         >
           <Spinner
@@ -86,6 +107,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
             })}
           >
             <Header.Title>Select an account</Header.Title>
+            {/*TODO: update this apps name*/}
             <Header.Subtitle localizationKey={'to continue to Sisyphus'} />
           </Header.Root>
           <Col
@@ -93,6 +115,27 @@ export const OrganizationListPage = withCardStateProvider(() => {
             gap={4}
           >
             <PreviewListItems>
+              <Flex
+                align='center'
+                gap={2}
+                sx={t => ({
+                  minHeight: 'unset',
+                  height: t.space.$12,
+                  justifyContent: 'space-between',
+                  padding: `0 ${t.space.$8}`,
+                })}
+                elementDescriptor={descriptors.organizationListPreviewItem}
+              >
+                <PersonalWorkspacePreview
+                  user={userWithoutIdentifiers}
+                  avatarSx={t => ({ width: t.sizes.$10, height: t.sizes.$10 })}
+                  mainIdentifierSx={t => ({
+                    fontSize: t.fontSizes.$xl,
+                    color: t.colors.$colorText,
+                  })}
+                  title={localizationKeys('organizationSwitcher.personalWorkspace')}
+                />
+              </Flex>
               {userMemberships?.data?.map(inv => {
                 return (
                   <MembershipPreview
@@ -105,12 +148,10 @@ export const OrganizationListPage = withCardStateProvider(() => {
               {!userMemberships?.hasNextPage &&
                 userInvitations?.data?.map(inv => {
                   return (
-                    <PreviewListItem
+                    <InvitationPreview
                       key={inv.id}
-                      organizationData={inv.publicOrganizationData}
-                    >
-                      <AcceptRejectInvitationButtons {...inv} />
-                    </PreviewListItem>
+                      {...inv}
+                    />
                   );
                 })}
 
@@ -118,12 +159,10 @@ export const OrganizationListPage = withCardStateProvider(() => {
                 !userInvitations?.hasNextPage &&
                 userSuggestions?.data?.map(inv => {
                   return (
-                    <PreviewListItem
+                    <SuggestionPreview
                       key={inv.id}
-                      organizationData={inv.publicOrganizationData}
-                    >
-                      <Accept {...inv} />
-                    </PreviewListItem>
+                      {...inv}
+                    />
                   );
                 })}
 
@@ -132,6 +171,12 @@ export const OrganizationListPage = withCardStateProvider(() => {
             {/*<UserMembershipList />*/}
             {/*<UserInvitationList />*/}
             {/*<UserSuggestionList />*/}
+            <Divider
+              key={`divider`}
+              sx={t => ({
+                padding: `${t.space.$none} ${t.space.$8}`,
+              })}
+            />
 
             <Flex
               align='center'

@@ -1,20 +1,20 @@
 import type { ClerkPaginatedResponse, UserOrganizationInvitationResource } from '@clerk/types';
 
 import { useCoreOrganizationList } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { localizationKeys, Text } from '../../customizables';
 import { useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { handleError } from '../../utils';
-import { organizationListParams } from './utils';
 import {
+  PreviewList,
   PreviewListDivider,
   PreviewListItem,
   PreviewListItemButton,
-  PreviewListSpinner,
-  PreviewList,
   PreviewListItems,
+  PreviewListSpinner,
   PreviewListSubtitle,
 } from './shared';
+import { organizationListParams } from './utils';
 
 export const UserInvitationList = () => {
   const { ref } = useInView({
@@ -66,44 +66,51 @@ export const UserInvitationList = () => {
 
 export const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource) => {
   const card = useCardState();
-  const { userInvitations, userMemberships } = useCoreOrganizationList({
+  const { userInvitations } = useCoreOrganizationList({
     userInvitations: organizationListParams.userInvitations,
-    userMemberships: organizationListParams.userMemberships,
   });
 
   const handleAccept = () => {
     return card
-      .runAsync(
-        props.accept().then(async res => {
-          await (userMemberships as any)?.unstable__mutate();
-          return res;
-        }),
-      )
-      .then(async result => {
+      .runAsync(props.accept())
+      .then(result => {
         (userInvitations as any)?.unstable__mutate?.(result, {
           populateCache: (
             updatedInvitation: UserOrganizationInvitationResource,
             invitationInfinitePages: ClerkPaginatedResponse<UserOrganizationInvitationResource>[],
           ) => {
-            const prevTotalCount = invitationInfinitePages[invitationInfinitePages.length - 1].total_count;
-
             return invitationInfinitePages.map(item => {
-              const newData = item.data.filter(obj => {
-                return obj.id !== updatedInvitation.id;
+              const newData = item.data.map(obj => {
+                if (obj.id === updatedInvitation.id) {
+                  return {
+                    ...updatedInvitation,
+                  };
+                }
+
+                return obj;
               });
-              return { ...item, data: newData, total_count: prevTotalCount - 1 };
+              return { ...item, data: newData };
             });
           },
           // Since `accept` gives back the updated information,
           // we don't need to revalidate here.
           revalidate: false,
         });
-
-        // Fetch memberships again to update the list in the UI
-        await (userMemberships as any)?.unstable__mutate();
       })
       .catch(err => handleError(err, [], card.setError));
   };
+
+  if (props.status === 'accepted') {
+    return (
+      <Text
+        variant='smallRegular'
+        colorScheme='neutral'
+      >
+        {/*TODO: localize this*/}
+        Joined
+      </Text>
+    );
+  }
 
   return (
     <PreviewListItemButton
@@ -114,7 +121,7 @@ export const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationR
   );
 };
 
-const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
+export const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
   return (
     <PreviewListItem organizationData={props.publicOrganizationData}>
       <AcceptRejectInvitationButtons {...props} />
