@@ -305,13 +305,29 @@ export const useOrganizationListContext = () => {
 
   const afterCreateOrganizationUrl = ctx.afterCreateOrganizationUrl || displayConfig.afterCreateOrganizationUrl;
 
-  const afterSkipUrl = ctx.afterSkipUrl;
-
   const navigateCreateOrganization = () => navigate(ctx.createOrganizationUrl || displayConfig.createOrganizationUrl);
 
-  const navigateAfterSelectOrganization = (organization: OrganizationResource) => {
+  const navigateAfterSelectOrganizationOrPersonal = ({
+    organization,
+    user,
+  }: {
+    organization?: OrganizationResource;
+    user?: UserResource;
+  }) => {
+    if (typeof ctx.afterSelectPersonalUrl === 'function' && user) {
+      return navigate(ctx.afterSelectPersonalUrl(user));
+    }
+
     if (typeof ctx.afterSelectOrganizationUrl === 'function' && organization) {
       return navigate(ctx.afterSelectOrganizationUrl(organization));
+    }
+
+    if (ctx.afterSelectPersonalUrl && user) {
+      const parsedUrl = populateParamFromObject({
+        urlWithParam: ctx.afterSelectPersonalUrl as string,
+        entity: user,
+      });
+      return navigate(parsedUrl);
     }
 
     if (ctx.afterSelectOrganizationUrl && organization) {
@@ -325,13 +341,18 @@ export const useOrganizationListContext = () => {
     return Promise.resolve();
   };
 
+  const navigateAfterSelectOrganization = (organization: OrganizationResource) =>
+    navigateAfterSelectOrganizationOrPersonal({ organization });
+  const navigateAfterSelectPersonal = (user: UserResource) => navigateAfterSelectOrganizationOrPersonal({ user });
+
   return {
     ...ctx,
     createOrganizationMode: ctx.createOrganizationMode || 'modal',
     afterCreateOrganizationUrl,
-    afterSkipUrl,
+    hidePersonal: ctx.hidePersonal || false,
     navigateCreateOrganization,
     navigateAfterSelectOrganization,
+    navigateAfterSelectPersonal,
     componentName,
   };
 };

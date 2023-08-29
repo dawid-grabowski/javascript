@@ -54,7 +54,7 @@ export const PreviewListItems = (props: PropsWithChildren) => {
   return (
     <Col
       elementDescriptor={descriptors.organizationListPreviewItems}
-      gap={3}
+      // gap={3}
       sx={t => ({
         maxHeight: `calc(8 * ${t.sizes.$12})`,
         overflowY: 'auto',
@@ -77,9 +77,9 @@ export const PreviewListItem = (
       gap={2}
       sx={t => ({
         minHeight: 'unset',
-        height: t.space.$12,
+        height: t.space.$24,
         justifyContent: 'space-between',
-        padding: `0 ${t.space.$8}`,
+        padding: `${t.space.$2} ${t.space.$8}`,
       })}
       elementDescriptor={descriptors.organizationListPreviewItem}
     >

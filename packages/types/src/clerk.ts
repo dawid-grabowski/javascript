@@ -869,16 +869,41 @@ export type OrganizationListProps = {
    */
   createOrganizationUrl?: string;
   /**
-   * Full URL or path where the <CreateOrganization /> component is mounted.
-   * @default undefined
-   */
-  afterSkipUrl?: string;
-  /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: OrganizationListTheme;
+
+  createOrganizationProps?: {
+    /**
+     * Hides the screen for sending invitations after an organization is created.
+     * @default undefined When left undefined Clerk will automatically hide the screen if
+     * the number of max allowed members is equal to 1
+     */
+    skipInvitationScreen?: boolean;
+    /**
+     * Customisation options to fully match the Clerk components to your own brand.
+     * These options serve as overrides and will be merged with the global `appearance`
+     * prop of ClerkProvided (if one is provided)
+     */
+    appearance?: CreateOrganizationTheme;
+  };
+
+  /**
+   * By default, users can switch between organization and their personal account.
+   * This option controls whether OrganizationList will include the user's personal account
+   * in the organization list. Setting this to `false` will hide the personal account entry,
+   * and users will only be able to switch between organizations.
+   * @default true
+   */
+  hidePersonal?: boolean;
+  /**
+   * Full URL or path to navigate after a successful selection of personal workspace.
+   * Accepts a function that returns URL or path
+   * @default undefined`
+   */
+  afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
 };
 
 export interface HandleMagicLinkVerificationParams {

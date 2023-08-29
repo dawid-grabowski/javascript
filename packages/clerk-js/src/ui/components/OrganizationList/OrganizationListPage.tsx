@@ -16,10 +16,12 @@ import {
   Header,
   OrganizationPreview,
   PersonalWorkspacePreview,
+  PreviewButton,
   useCardState,
   withCardStateProvider,
 } from '../../elements';
 import { useInView } from '../../hooks';
+import { ArrowRightIcon } from '../../icons';
 import { PreviewListItems, PreviewListSpinner } from './shared';
 import { InvitationPreview } from './UserInvitationList';
 import { MembershipPreview } from './UserMembershipList';
@@ -30,24 +32,37 @@ export const OrganizationListPage = withCardStateProvider(() => {
   const card = useCardState();
   const clerk = useCoreClerk();
   const {
-    // TODO: remove this from types
-    // afterSkipUrl,
+    hidePersonal,
+    navigateAfterSelectPersonal,
     createOrganizationMode,
     afterCreateOrganizationUrl,
     navigateCreateOrganization,
   } = useOrganizationListContext();
 
-  const w = useEnvironment();
-  console.log(w.displayConfig.applicationName);
+  const environment = useEnvironment();
 
-  const { userMemberships, userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
+  const { isLoaded, setActive, userMemberships, userInvitations, userSuggestions } =
+    useCoreOrganizationList(organizationListParams);
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
 
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
+
+  const user = useCoreUser();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
-  console.log(isLoading, hasNextPage, userMemberships.hasNextPage, userInvitations.hasNextPage);
+  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
+
+  const handlePersonalClicked = () => {
+    if (!isLoaded) {
+      return;
+    }
+    return card.runAsync(() =>
+      setActive({
+        organization: null,
+        beforeEmit: () => navigateAfterSelectPersonal(user),
+      }),
+    );
+  };
 
   const { ref } = useInView({
     threshold: 0,
@@ -106,36 +121,57 @@ export const OrganizationListPage = withCardStateProvider(() => {
               padding: `${t.space.$none} ${t.space.$8}`,
             })}
           >
-            <Header.Title>Select an account</Header.Title>
-            {/*TODO: update this apps name*/}
-            <Header.Subtitle localizationKey={'to continue to Sisyphus'} />
+            <Header.Title
+              localizationKey={localizationKeys(
+                !hidePersonal ? 'organizationList.title' : 'organizationList.titleWithoutPersonal',
+              )}
+            />
+            <Header.Subtitle
+              localizationKey={localizationKeys('organizationList.subtitle', {
+                applicationName: environment.displayConfig.applicationName,
+              })}
+            />
           </Header.Root>
           <Col
             elementDescriptor={descriptors.main}
             gap={4}
           >
             <PreviewListItems>
-              <Flex
-                align='center'
-                gap={2}
-                sx={t => ({
-                  minHeight: 'unset',
-                  height: t.space.$12,
-                  justifyContent: 'space-between',
-                  padding: `0 ${t.space.$8}`,
-                })}
-                elementDescriptor={descriptors.organizationListPreviewItem}
-              >
-                <PersonalWorkspacePreview
-                  user={userWithoutIdentifiers}
-                  avatarSx={t => ({ width: t.sizes.$10, height: t.sizes.$10 })}
-                  mainIdentifierSx={t => ({
-                    fontSize: t.fontSizes.$xl,
-                    color: t.colors.$colorText,
+              {!hidePersonal && (
+                <PreviewButton
+                  sx={t => ({
+                    height: t.space.$24,
+                    padding: `${t.space.$2} ${t.space.$8}`,
                   })}
-                  title={localizationKeys('organizationSwitcher.personalWorkspace')}
-                />
-              </Flex>
+                  icon={ArrowRightIcon}
+                  iconProps={{
+                    size: 'lg',
+                  }}
+                  showIconOnHover={false}
+                  onClick={handlePersonalClicked}
+                >
+                  {/*<Flex*/}
+                  {/*  align='center'*/}
+                  {/*  gap={2}*/}
+                  {/*  sx={t => ({*/}
+                  {/*    minHeight: 'unset',*/}
+                  {/*    height: t.space.$24,*/}
+                  {/*    justifyContent: 'space-between',*/}
+                  {/*    padding: `${t.space.$2} ${t.space.$8}`,*/}
+                  {/*  })}*/}
+                  {/*  elementDescriptor={descriptors.organizationListPreviewItem}*/}
+                  {/*>*/}
+                  <PersonalWorkspacePreview
+                    user={userWithoutIdentifiers}
+                    avatarSx={t => ({ width: t.sizes.$10, height: t.sizes.$10 })}
+                    mainIdentifierSx={t => ({
+                      fontSize: t.fontSizes.$xl,
+                      color: t.colors.$colorText,
+                    })}
+                    title={localizationKeys('organizationSwitcher.personalWorkspace')}
+                  />
+                </PreviewButton>
+              )}
               {userMemberships?.data?.map(inv => {
                 return (
                   <MembershipPreview

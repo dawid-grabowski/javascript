@@ -3,66 +3,66 @@ import type { ClerkPaginatedResponse, UserOrganizationInvitationResource } from 
 import { useCoreOrganizationList } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { useCardState, withCardStateProvider } from '../../elements';
-import { useInView } from '../../hooks';
+// import { useInView } from '../../hooks';
 import { handleError } from '../../utils';
 import {
-  PreviewList,
-  PreviewListDivider,
+  // PreviewList,
+  // PreviewListDivider,
   PreviewListItem,
   PreviewListItemButton,
-  PreviewListItems,
-  PreviewListSpinner,
-  PreviewListSubtitle,
+  // PreviewListItems,
+  // PreviewListSpinner,
+  // PreviewListSubtitle,
 } from './shared';
 import { organizationListParams } from './utils';
 
-export const UserInvitationList = () => {
-  const { ref } = useInView({
-    threshold: 0,
-    onChange: inView => {
-      if (inView) {
-        userInvitations.fetchNext?.();
-      }
-    },
-  });
-
-  const { userInvitations } = useCoreOrganizationList({
-    userInvitations: organizationListParams.userInvitations,
-  });
-
-  if ((userInvitations.count ?? 0) === 0) {
-    return null;
-  }
-
-  return (
-    <PreviewList elementId='invitations'>
-      <PreviewListSubtitle
-        localizationKey={localizationKeys(
-          (userInvitations.count ?? 0) > 1
-            ? 'organizationList.invitationCountLabel_many'
-            : 'organizationList.invitationCountLabel_single',
-          {
-            count: userInvitations.count,
-          },
-        )}
-      />
-
-      <PreviewListItems>
-        {userInvitations?.data?.map(inv => {
-          return (
-            <InvitationPreview
-              key={inv.id}
-              {...inv}
-            />
-          );
-        })}
-
-        {userInvitations.hasNextPage && <PreviewListSpinner ref={ref} />}
-      </PreviewListItems>
-      <PreviewListDivider />
-    </PreviewList>
-  );
-};
+// export const UserInvitationList = () => {
+//   const { ref } = useInView({
+//     threshold: 0,
+//     onChange: inView => {
+//       if (inView) {
+//         userInvitations.fetchNext?.();
+//       }
+//     },
+//   });
+//
+//   const { userInvitations } = useCoreOrganizationList({
+//     userInvitations: organizationListParams.userInvitations,
+//   });
+//
+//   if ((userInvitations.count ?? 0) === 0) {
+//     return null;
+//   }
+//
+//   return (
+//     <PreviewList elementId='invitations'>
+//       <PreviewListSubtitle
+//         localizationKey={localizationKeys(
+//           (userInvitations.count ?? 0) > 1
+//             ? 'organizationList.invitationCountLabel_many'
+//             : 'organizationList.invitationCountLabel_single',
+//           {
+//             count: userInvitations.count,
+//           },
+//         )}
+//       />
+//
+//       <PreviewListItems>
+//         {userInvitations?.data?.map(inv => {
+//           return (
+//             <InvitationPreview
+//               key={inv.id}
+//               {...inv}
+//             />
+//           );
+//         })}
+//
+//         {userInvitations.hasNextPage && <PreviewListSpinner ref={ref} />}
+//       </PreviewListItems>
+//       <PreviewListDivider />
+//     </PreviewList>
+//   );
+// };
 
 export const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource) => {
   const card = useCardState();
@@ -105,10 +105,8 @@ export const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationR
       <Text
         variant='smallRegular'
         colorScheme='neutral'
-      >
-        {/*TODO: localize this*/}
-        Joined
-      </Text>
+        localizationKey={localizationKeys('organizationList.invitationAcceptedLabel')}
+      />
     );
   }
 
