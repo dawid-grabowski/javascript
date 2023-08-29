@@ -28,6 +28,33 @@ import { MembershipPreview } from './UserMembershipList';
 import { SuggestionPreview } from './UserSuggestionList';
 import { organizationListParams } from './utils';
 
+const useFetchList = () => {
+  const { userMemberships, userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
+
+  const { ref } = useInView({
+    threshold: 0,
+    onChange: inView => {
+      if (!inView) {
+        return;
+      }
+      if (userMemberships.hasNextPage) {
+        (userMemberships as any)?.unstable__fetchNextAsync?.();
+      } else if (userInvitations.hasNextPage) {
+        (userInvitations as any)?.unstable__fetchNextAsync?.();
+      } else {
+        userSuggestions.fetchNext?.();
+      }
+    },
+  });
+
+  return {
+    userMemberships,
+    userInvitations,
+    userSuggestions,
+    ref,
+  };
+};
+
 export const OrganizationListPage = withCardStateProvider(() => {
   const card = useCardState();
   const clerk = useCoreClerk();
@@ -41,8 +68,9 @@ export const OrganizationListPage = withCardStateProvider(() => {
 
   const environment = useEnvironment();
 
-  const { isLoaded, setActive, userMemberships, userInvitations, userSuggestions } =
-    useCoreOrganizationList(organizationListParams);
+  const { isLoaded, setActive } = useCoreOrganizationList();
+
+  const { ref, userMemberships, userSuggestions, userInvitations } = useFetchList();
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
 
@@ -63,23 +91,6 @@ export const OrganizationListPage = withCardStateProvider(() => {
       }),
     );
   };
-
-  const { ref } = useInView({
-    threshold: 0,
-    onChange: inView => {
-      if (!inView) {
-        return;
-      }
-
-      if (userMemberships.hasNextPage) {
-        (userMemberships as any)?.unstable__fetchNextAsync?.();
-      } else if (userInvitations.hasNextPage) {
-        (userInvitations as any)?.unstable__fetchNextAsync?.();
-      } else {
-        userSuggestions.fetchNext?.();
-      }
-    },
-  });
 
   const handleCreateOrganizationClicked = () => {
     if (createOrganizationMode === 'navigation') {
