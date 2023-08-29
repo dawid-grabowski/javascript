@@ -136,9 +136,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
 
               {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
             </PreviewListItems>
-            {/*<UserMembershipList />*/}
-            {/*<UserInvitationList />*/}
-            {/*<UserSuggestionList />*/}
+
             <Divider
               key={`divider`}
               sx={t => ({
@@ -153,18 +151,6 @@ export const OrganizationListPage = withCardStateProvider(() => {
                 padding: `${t.space.$none} ${t.space.$8}`,
               })}
             >
-              {/*  <Text*/}
-              {/*  variant='largeMedium'*/}
-              {/*  colorScheme='neutral'*/}
-              {/*  sx={t => ({*/}
-              {/*    fontWeight: t.fontWeights.$normal,*/}
-              {/*    minHeight: 'unset',*/}
-              {/*    height: t.space.$7,*/}
-              {/*    display: 'flex',*/}
-              {/*    alignItems: 'center',*/}
-              {/*  })}*/}
-              {/*  localizationKey={localizationKeys('organizationList.createOrganization')}*/}
-              {/*/>*/}
               <Button
                 elementDescriptor={descriptors.button}
                 block
@@ -179,23 +165,6 @@ export const OrganizationListPage = withCardStateProvider(() => {
           </Col>
         </>
       )}
-
-      {/*{!isLoading && afterSkipUrl && (*/}
-      {/*  <Footer.Root>*/}
-      {/*    <Footer.Action*/}
-      {/*      elementId='organizationList'*/}
-      {/*      sx={t => ({*/}
-      {/*        padding: `${t.space.$none} ${t.space.$8}`,*/}
-      {/*      })}*/}
-      {/*    >*/}
-      {/*      <Footer.ActionLink*/}
-      {/*        localizationKey={localizationKeys('organizationList.actionLink')}*/}
-      {/*        to={clerk.buildUrlWithAuth(afterSkipUrl)}*/}
-      {/*      />*/}
-      {/*    </Footer.Action>*/}
-      {/*    <Footer.Links />*/}
-      {/*  </Footer.Root>*/}
-      {/*)}*/}
     </Card>
   );
 });

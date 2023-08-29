@@ -728,15 +728,6 @@ type _LocalizationResource = {
     titleWithoutPersonal: LocalizationValue;
     subtitle: LocalizationValue;
     action__createOrganization: LocalizationValue;
-    // action__setActiveOrganization: LocalizationValue;
-    // actionLink: LocalizationValue;
-
-    // organizationCountLabel_single: LocalizationValue;
-    // organizationCountLabel_many: LocalizationValue;
-    // invitationCountLabel_single: LocalizationValue;
-    // invitationCountLabel_many: LocalizationValue;
-    // suggestionCountLabel_single: LocalizationValue;
-    // suggestionCountLabel_many: LocalizationValue;
     action__invitationAccept: LocalizationValue;
     action__suggestionsAccept: LocalizationValue;
     suggestionsAcceptedLabel: LocalizationValue;
