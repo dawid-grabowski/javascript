@@ -1,30 +1,10 @@
-import type { UserOrganizationInvitationResource } from '@clerk/types';
-import type { PropsWithChildren } from 'react';
-
-import {
-  useCoreClerk,
-  useCoreOrganizationList,
-  useCoreUser,
-  useEnvironment,
-  useOrganizationListContext,
-} from '../../contexts';
+import { useCoreClerk, useCoreOrganizationList, useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Button, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import {
-  Card,
-  CardAlert,
-  Divider,
-  Header,
-  OrganizationPreview,
-  PersonalWorkspacePreview,
-  PreviewButton,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
+import { Card, CardAlert, Divider, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
-import { ArrowRightIcon } from '../../icons';
 import { PreviewListItems, PreviewListSpinner } from './shared';
 import { InvitationPreview } from './UserInvitationList';
-import { MembershipPreview } from './UserMembershipList';
+import { MembershipPreview, PersonalAccountPreview } from './UserMembershipList';
 import { SuggestionPreview } from './UserSuggestionList';
 import { organizationListParams } from './utils';
 
@@ -38,9 +18,9 @@ const useFetchList = () => {
         return;
       }
       if (userMemberships.hasNextPage) {
-        (userMemberships as any)?.unstable__fetchNextAsync?.();
+        userMemberships.fetchNext?.();
       } else if (userInvitations.hasNextPage) {
-        (userInvitations as any)?.unstable__fetchNextAsync?.();
+        userInvitations.fetchNext?.();
       } else {
         userSuggestions.fetchNext?.();
       }
@@ -58,39 +38,16 @@ const useFetchList = () => {
 export const OrganizationListPage = withCardStateProvider(() => {
   const card = useCardState();
   const clerk = useCoreClerk();
-  const {
-    hidePersonal,
-    navigateAfterSelectPersonal,
-    createOrganizationMode,
-    afterCreateOrganizationUrl,
-    navigateCreateOrganization,
-  } = useOrganizationListContext();
+  const { hidePersonal, createOrganizationMode, afterCreateOrganizationUrl, navigateCreateOrganization } =
+    useOrganizationListContext();
 
   const environment = useEnvironment();
-
-  const { isLoaded, setActive } = useCoreOrganizationList();
 
   const { ref, userMemberships, userSuggestions, userInvitations } = useFetchList();
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
 
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
-
-  const user = useCoreUser();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
-
-  const handlePersonalClicked = () => {
-    if (!isLoaded) {
-      return;
-    }
-    return card.runAsync(() =>
-      setActive({
-        organization: null,
-        beforeEmit: () => navigateAfterSelectPersonal(user),
-      }),
-    );
-  };
 
   const handleCreateOrganizationClicked = () => {
     if (createOrganizationMode === 'navigation') {
@@ -101,9 +58,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
 
   return (
     <Card
-      // justify={'between'}
       sx={t => ({
-        // minHeight: t.sizes.$100,
         padding: `${t.space.$8} ${t.space.$none}`,
       })}
     >
@@ -148,41 +103,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
             gap={4}
           >
             <PreviewListItems>
-              {!hidePersonal && (
-                <PreviewButton
-                  sx={t => ({
-                    height: t.space.$24,
-                    padding: `${t.space.$2} ${t.space.$8}`,
-                  })}
-                  icon={ArrowRightIcon}
-                  iconProps={{
-                    size: 'lg',
-                  }}
-                  showIconOnHover={false}
-                  onClick={handlePersonalClicked}
-                >
-                  {/*<Flex*/}
-                  {/*  align='center'*/}
-                  {/*  gap={2}*/}
-                  {/*  sx={t => ({*/}
-                  {/*    minHeight: 'unset',*/}
-                  {/*    height: t.space.$24,*/}
-                  {/*    justifyContent: 'space-between',*/}
-                  {/*    padding: `${t.space.$2} ${t.space.$8}`,*/}
-                  {/*  })}*/}
-                  {/*  elementDescriptor={descriptors.organizationListPreviewItem}*/}
-                  {/*>*/}
-                  <PersonalWorkspacePreview
-                    user={userWithoutIdentifiers}
-                    avatarSx={t => ({ width: t.sizes.$10, height: t.sizes.$10 })}
-                    mainIdentifierSx={t => ({
-                      fontSize: t.fontSizes.$xl,
-                      color: t.colors.$colorText,
-                    })}
-                    title={localizationKeys('organizationSwitcher.personalWorkspace')}
-                  />
-                </PreviewButton>
-              )}
+              <PersonalAccountPreview />
               {userMemberships?.data?.map(inv => {
                 return (
                   <MembershipPreview
@@ -278,34 +199,3 @@ export const OrganizationListPage = withCardStateProvider(() => {
     </Card>
   );
 });
-
-export const PreviewListItem = (
-  props: PropsWithChildren<{
-    organizationData: UserOrganizationInvitationResource['publicOrganizationData'];
-  }>,
-) => {
-  return (
-    <Flex
-      align='center'
-      gap={2}
-      sx={t => ({
-        minHeight: 'unset',
-        height: t.space.$12,
-        justifyContent: 'space-between',
-        padding: `0 ${t.space.$8}`,
-      })}
-      elementDescriptor={descriptors.organizationListPreviewItem}
-    >
-      <OrganizationPreview
-        elementId='organizationList'
-        avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)`, width: t.sizes.$10, height: t.sizes.$10 })}
-        mainIdentifierSx={t => ({
-          fontSize: t.fontSizes.$xl,
-          color: t.colors.$colorText,
-        })}
-        organization={props.organizationData}
-      />
-      {props.children}
-    </Flex>
-  );
-};

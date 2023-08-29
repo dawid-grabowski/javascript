@@ -87,7 +87,6 @@ type UsePagesOrInfinite = <
   cacheKeys: CacheKeys,
 ) => PaginatedResources<ExtractData<FetcherReturnData>> & {
   unstable__mutate: () => Promise<unknown>;
-  unstable__fetchNextAsync: () => Promise<{ pageCount: number }>;
 };
 
 export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options, cacheKeys) => {
@@ -200,16 +199,6 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     fetchPage(n => Math.max(0, n + 1));
   }, [fetchPage]);
 
-  const unstable__fetchNextAsync = useCallback(async () => {
-    const pages = await setSize(n => Math.max(0, n + 1));
-    const count = pages?.[pages?.length - 1]?.total_count || 0;
-    const pageCount = Math.ceil((count - offsetCount) / pageSizeRef.current);
-    return {
-      pageCount,
-      page: pages?.length,
-    };
-  }, [fetchPage]);
-
   const fetchPrevious = useCallback(() => {
     fetchPage(n => Math.max(0, n - 1));
   }, [fetchPage]);
@@ -234,6 +223,5 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     hasNextPage,
     hasPreviousPage,
     unstable__mutate,
-    unstable__fetchNextAsync,
   };
 };

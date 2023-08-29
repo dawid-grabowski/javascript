@@ -2,59 +2,15 @@ import type { UserOrganizationInvitationResource } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import { forwardRef } from 'react';
 
-import type { Text } from '../../customizables';
 import { Box, Button, Col, descriptors, Flex, Spinner } from '../../customizables';
-import { Header, OrganizationPreview } from '../../elements';
+import { OrganizationPreview, PreviewButton } from '../../elements';
+import { ArrowRightIcon } from '../../icons';
 import { common } from '../../styledSystem';
-
-export const PreviewList = (
-  props: PropsWithChildren<{
-    elementId: any; //Parameters<typeof descriptors.organizationListPreviewList.setId>[0];
-  }>,
-) => {
-  return (
-    <Flex
-      direction='col'
-      // elementDescriptor={descriptors.organizationListPreviewList}
-      gap={2}
-    >
-      {props.children}
-    </Flex>
-  );
-};
-
-export const PreviewListSubtitle = (props: Parameters<typeof Text>[0]) => {
-  return (
-    <Header.Root>
-      <Header.Subtitle
-        elementDescriptor={descriptors.organizationListPreviewListSubtitle}
-        sx={t => ({
-          lineHeight: t.sizes.$7,
-          padding: `${t.space.$none} ${t.space.$8}`,
-        })}
-        {...props}
-      />
-    </Header.Root>
-  );
-};
-
-export const PreviewListDivider = () => {
-  return (
-    <Box
-      elementDescriptor={descriptors.organizationListPreviewListDivider}
-      sx={t => ({
-        margin: `${t.space.$2} ${t.space.$8} ${t.space.$none} ${t.space.$8}`,
-        borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
-      })}
-    />
-  );
-};
 
 export const PreviewListItems = (props: PropsWithChildren) => {
   return (
     <Col
       elementDescriptor={descriptors.organizationListPreviewItems}
-      // gap={3}
       sx={t => ({
         maxHeight: `calc(8 * ${t.sizes.$12})`,
         overflowY: 'auto',
@@ -138,13 +94,19 @@ export const PreviewListItemButton = (props: Parameters<typeof Button>[0]) => {
   );
 };
 
-export const PreviewListItemDestructiveButton = (props: Parameters<typeof Button>[0]) => {
+export const OrganizationListPreviewButton = (props: PropsWithChildren<{ onClick: () => void | Promise<void> }>) => {
   return (
-    <Button
-      elementDescriptor={descriptors.organizationListPreviewItemDestructiveActionButton}
-      textVariant='buttonExtraSmallBold'
-      variant='solid'
-      size='sm'
+    <PreviewButton
+      elementDescriptor={descriptors.organizationListPreviewButton}
+      sx={t => ({
+        height: t.space.$14,
+        padding: `${t.space.$2} ${t.space.$8}`,
+      })}
+      icon={ArrowRightIcon}
+      iconProps={{
+        size: 'lg',
+      }}
+      showIconOnHover={false}
       {...props}
     />
   );
