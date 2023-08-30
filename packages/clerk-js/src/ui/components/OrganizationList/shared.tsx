@@ -5,6 +5,7 @@ import { forwardRef } from 'react';
 import { Box, Button, Col, descriptors, Flex, Spinner } from '../../customizables';
 import { OrganizationPreview, PreviewButton } from '../../elements';
 import { ArrowRightIcon } from '../../icons';
+import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 
 export const PreviewListItems = (props: PropsWithChildren) => {
@@ -22,6 +23,11 @@ export const PreviewListItems = (props: PropsWithChildren) => {
   );
 };
 
+const sharedStyles: ThemableCssProp = t => ({
+  height: t.space.$14,
+  padding: `${t.space.$2} ${t.space.$8}`,
+});
+
 export const PreviewListItem = (
   props: PropsWithChildren<{
     organizationData: UserOrganizationInvitationResource['publicOrganizationData'];
@@ -31,12 +37,13 @@ export const PreviewListItem = (
     <Flex
       align='center'
       gap={2}
-      sx={t => ({
-        minHeight: 'unset',
-        height: t.space.$24,
-        justifyContent: 'space-between',
-        padding: `${t.space.$2} ${t.space.$8}`,
-      })}
+      sx={[
+        _ => ({
+          minHeight: 'unset',
+          justifyContent: 'space-between',
+        }),
+        sharedStyles,
+      ]}
       elementDescriptor={descriptors.organizationListPreviewItem}
     >
       <OrganizationPreview
@@ -98,10 +105,7 @@ export const OrganizationListPreviewButton = (props: PropsWithChildren<{ onClick
   return (
     <PreviewButton
       elementDescriptor={descriptors.organizationListPreviewButton}
-      sx={t => ({
-        height: t.space.$14,
-        padding: `${t.space.$2} ${t.space.$8}`,
-      })}
+      sx={[sharedStyles]}
       icon={ArrowRightIcon}
       iconProps={{
         size: 'lg',
