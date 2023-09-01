@@ -76,7 +76,8 @@ export const OrganizationListPage = withCardStateProvider(() => {
 });
 
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
-  const { navigateAfterSelectOrganization } = useOrganizationListContext();
+  const environment = useEnvironment();
+  const { navigateAfterSelectOrganization, skipInvitationScreen } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
   return (
     <>
@@ -91,7 +92,17 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
           })}
         >
           <CreateOrganizationForm
-            navigateAfterCreateOrganization={navigateAfterSelectOrganization}
+            flow='organizationList'
+            skipInvitationScreen={skipInvitationScreen}
+            startPage={{
+              headerTitle: localizationKeys('createOrganization.title'),
+              headerSubtitle: localizationKeys('organizationList.subtitle', {
+                applicationName: environment.displayConfig.applicationName,
+              }),
+            }}
+            navigateAfterCreateOrganization={org =>
+              navigateAfterSelectOrganization(org).then(() => setCreateOrganizationFlow(false))
+            }
             onCancel={
               showListInitially && isCreateOrganizationFlow ? () => setCreateOrganizationFlow(false) : undefined
             }

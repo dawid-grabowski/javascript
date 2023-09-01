@@ -305,7 +305,21 @@ export const useOrganizationListContext = () => {
 
   const afterCreateOrganizationUrl = ctx.afterCreateOrganizationUrl || displayConfig.afterCreateOrganizationUrl;
 
-  const navigateCreateOrganization = () => navigate(ctx.createOrganizationUrl || displayConfig.createOrganizationUrl);
+  const navigateAfterCreateOrganization = (organization: OrganizationResource) => {
+    if (typeof ctx.afterCreateOrganizationUrl === 'function') {
+      return navigate(ctx.afterCreateOrganizationUrl(organization));
+    }
+
+    if (ctx.afterCreateOrganizationUrl) {
+      const parsedUrl = populateParamFromObject({
+        urlWithParam: ctx.afterCreateOrganizationUrl,
+        entity: organization,
+      });
+      return navigate(parsedUrl);
+    }
+
+    return navigate(displayConfig.afterCreateOrganizationUrl);
+  };
 
   const navigateAfterSelectOrganizationOrPersonal = ({
     organization,
@@ -347,10 +361,10 @@ export const useOrganizationListContext = () => {
 
   return {
     ...ctx,
-    createOrganizationMode: ctx.createOrganizationMode || 'modal',
     afterCreateOrganizationUrl,
+    skipInvitationScreen: ctx.skipInvitationScreen || false,
     hidePersonal: ctx.hidePersonal || false,
-    navigateCreateOrganization,
+    navigateAfterCreateOrganization,
     navigateAfterSelectOrganization,
     navigateAfterSelectPersonal,
     componentName,

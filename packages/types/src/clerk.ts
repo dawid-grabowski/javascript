@@ -857,39 +857,17 @@ export type OrganizationListProps = {
     | ((organization: OrganizationResource) => string)
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
-   * Controls whether clicking the "Create organization" button will cause
-   * the CreateOrganization component to open as a modal, or if the browser will navigate
-   * to the `createOrganizationUrl` where CreateOrganization is mounted as a page.
-   * @default modal
-   */
-  createOrganizationMode?: 'modal' | 'navigation';
-  /**
-   * Full URL or path where the <CreateOrganization /> component is mounted.
-   * @default undefined
-   */
-  createOrganizationUrl?: string;
-  /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: OrganizationListTheme;
-
-  createOrganizationProps?: {
-    /**
-     * Hides the screen for sending invitations after an organization is created.
-     * @default undefined When left undefined Clerk will automatically hide the screen if
-     * the number of max allowed members is equal to 1
-     */
-    skipInvitationScreen?: boolean;
-    /**
-     * Customisation options to fully match the Clerk components to your own brand.
-     * These options serve as overrides and will be merged with the global `appearance`
-     * prop of ClerkProvided (if one is provided)
-     */
-    appearance?: CreateOrganizationTheme;
-  };
-
+  /**
+   * Hides the screen for sending invitations after an organization is created.
+   * @default undefined When left undefined Clerk will automatically hide the screen if
+   * the number of max allowed members is equal to 1
+   */
+  skipInvitationScreen?: boolean;
   /**
    * By default, users can switch between organization and their personal account.
    * This option controls whether OrganizationList will include the user's personal account
