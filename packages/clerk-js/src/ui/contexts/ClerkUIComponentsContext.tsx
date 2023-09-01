@@ -403,6 +403,7 @@ export const useCreateOrganizationContext = () => {
 
   return {
     ...ctx,
+    skipInvitationScreen: ctx.skipInvitationScreen || false,
     navigateAfterCreateOrganization,
     componentName,
   };

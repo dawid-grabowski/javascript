@@ -5,6 +5,7 @@ import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization, useCoreOrganizationList } from '../../contexts';
 import { ContentPage, Form, FormButtonContainer, SuccessPage, useCardState } from '../../elements';
 import { QuestionMark } from '../../icons';
+import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { createSlug, handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
@@ -12,10 +13,15 @@ import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersPage
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
 
 type CreateOrganizationFormProps = {
-  skipInvitationScreen?: boolean;
+  skipInvitationScreen: boolean;
   navigateAfterCreateOrganization: (organization: OrganizationResource) => Promise<unknown>;
   onCancel?: () => void;
   onComplete?: () => void;
+  flow: 'default' | 'organizationList';
+  startPage: {
+    headerTitle: LocalizationKey;
+    headerSubtitle?: LocalizationKey;
+  };
 };
 
 export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
@@ -97,11 +103,17 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
     slugField.setValue(val);
   };
 
+  const headerTitleTextVariant = props.flow === 'organizationList' ? 'xlargeMedium' : undefined;
+  const headerSubtitleTextVariant = props.flow === 'organizationList' ? 'headingRegularRegular' : undefined;
+
   return (
     <Wizard {...wizard.props}>
       <ContentPage
         Breadcrumbs={null}
-        headerTitle={'Create Organization'}
+        headerTitle={props.startPage.headerTitle}
+        headerSubtitle={props.startPage.headerSubtitle}
+        headerTitleTextVariant={headerTitleTextVariant}
+        headerSubtitleTextVariant={headerSubtitleTextVariant}
         sx={t => ({ minHeight: t.sizes.$60 })}
       >
         <Form.Root onSubmit={onSubmit}>
@@ -147,6 +159,8 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
       <ContentPage
         Breadcrumbs={null}
         headerTitle={localizationKeys('organizationProfile.invitePage.title')}
+        headerTitleTextVariant={headerTitleTextVariant}
+        headerSubtitleTextVariant={headerSubtitleTextVariant}
         sx={t => ({ minHeight: t.sizes.$60 })}
       >
         {organization && (
@@ -160,6 +174,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
       </ContentPage>
       <SuccessPage
         title={localizationKeys('organizationProfile.invitePage.title')}
+        headerTitleTextVariant={headerTitleTextVariant}
         contents={<InvitationsSentMessage />}
         sx={t => ({ minHeight: t.sizes.$60 })}
         onFinish={completeFlow}
